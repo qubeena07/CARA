@@ -1,38 +1,39 @@
-"""
-CLI script to ingest documents into the vector store.
-Usage: python scripts/ingest_docs.py --path /path/to/docs
-"""
-import argparse
 import sys
 import os
+import argparse
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ingestion.ingest import ingest_document
+from database.connection import SessionLocal
+from ingestion.ingest import ingest_file
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Ingest documents into Cara vector store")
-    parser.add_argument("--path", required=True, help="Path to file or directory")
+    parser = argparse.ArgumentParser(description="Ingest documents into the RAG system")
+    parser.add_argument("--dir", help="Directory containing PDF/txt/md files")
+    parser.add_argument("--file", help="Single file to ingest")
     args = parser.parse_args()
 
-    path = args.path
-    if os.path.isfile(path):
-        with open(path, "r") as f:
-            content = f.read()
-        records = ingest_document(content, source=path)
-        print(f"Ingested {len(records)} chunks from {path}")
-    elif os.path.isdir(path):
-        for fname in os.listdir(path):
-            fpath = os.path.join(path, fname)
-            if os.path.isfile(fpath):
-                with open(fpath, "r") as f:
-                    content = f.read()
-                records = ingest_document(content, source=fpath)
-                print(f"Ingested {len(records)} chunks from {fpath}")
-    else:
-        print(f"Path not found: {path}")
-        sys.exit(1)
+    if not args.file and not args.dir:
+        parser.error("Provide --file or --dir")
+
+    db = SessionLocal()
+
+    try:
+        if args.file:
+            source_name = os.path.basename(args.file)
+            count = ingest_file(args.file, source_name, db)
+            print(f"Done. Inserted {count} chunks.")
+        elif args.dir:
+            total = 0
+            for filename in sorted(os.listdir(args.dir)):
+                if filename.endswith((".pdf", ".txt", ".md")):
+                    file_path = os.path.join(args.dir, filename)
+                    count = ingest_file(file_path, filename, db)
+                    total += count
+            print(f"\nTotal chunks inserted: {total}")
+    finally:
+        db.close()
 
 
 if __name__ == "__main__":
