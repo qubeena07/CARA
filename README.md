@@ -1,6 +1,6 @@
 # Cara
 
-A RAG (Retrieval-Augmented Generation) research assistant with a self-correcting LangGraph pipeline, SSE streaming, and an analytics dashboard.
+Corrective Adaptive Retrieval Architecture(CARA), a self-correcting RAG system implementing CRAG + Self-RAG patterns. Grades retrieved documents, rewrites failed queries, detects hallucinations, and streams the full reasoning trace to a real-time audit UI. Built with LangGraph, FastAPI, pgvector, and Next.js.
 
 ## Architecture
 
