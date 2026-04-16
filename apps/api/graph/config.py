@@ -21,5 +21,5 @@ EMBEDDING_MODEL = "multi-qa-mpnet-base-dot-v1"
 EMBEDDING_DIM = 768
 
 # LLM models
-FAST_LLM_MODEL = "gemini-2.0-flash"         # for grading, rewriting, hallucination check
-GENERATE_LLM_MODEL = "gemini-2.0-flash"     # for answer generation (same model, but streaming=True)
+FAST_LLM_MODEL = "gemini-2.5-flash"
+GENERATE_LLM_MODEL = "gemini-2.5-flash"# for answer generation (same model, but streaming=True)
