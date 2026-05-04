@@ -184,7 +184,7 @@ async def ask(request: AskRequest, db: Session = Depends(get_db)):
                 },
             })
 
-            # Persist query + audit trail
+            # Persist query first (audit_logs FK depends on queries.id)
             db.add(Query(
                 id=query_id,
                 session_id=session_id,
@@ -196,6 +196,7 @@ async def ask(request: AskRequest, db: Session = Depends(get_db)):
                 hallucination_detected=final_state.get("hallucination_detected", False),
                 regeneration_count=final_state.get("regeneration_count", 0),
             ))
+            db.flush()  # write Query to DB within transaction before audit_logs
             for entry in final_state.get("audit_log", []):
                 db.add(AuditLog(
                     query_id=query_id,

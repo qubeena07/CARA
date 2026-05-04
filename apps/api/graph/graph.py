@@ -49,7 +49,7 @@ def route_after_hallucination_check(state: GraphState) -> str:
     hallucinating = state.get("hallucination_detected", False)
     regen_count = state.get("regeneration_count", 0)
 
-    if hallucinating and regen_count <= MAX_REGENERATIONS:
+    if hallucinating and regen_count < MAX_REGENERATIONS:
         return "generate"
     else:
         return END
